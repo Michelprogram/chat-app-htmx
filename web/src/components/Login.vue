@@ -69,7 +69,6 @@ const tabsChange = () => {
                       name="password"
                       id="password"
                       type="password"
-                      value="dorian"
                       placeholder="password"
                       class="text-xl italic"
                   />
