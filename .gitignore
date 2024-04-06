@@ -1,0 +1,14 @@
+.idea
+mongo
+tmp
+bin
+.DS_Store
+.env
+
+web/node_modules
+web/dist
+web/.vscode
+web/htmx/**/**.go
+internal/pkg/dist
+connection.http
+
