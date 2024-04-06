@@ -1,0 +1,129 @@
+package chat
+
+import (
+    "github.com/michelprogram/htmx-go/internal/models"
+    "github.com/michelprogram/htmx-go/web/htmx/chat/emote"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "fmt"
+)
+
+func containerMessageId(id string) string {
+    return fmt.Sprintf("message-container-%s", id)
+}
+
+func pathMessage(messages []models.EmbdedMessage) string{
+    id := messages[len(messages) - 1].Message.ID.Hex()
+    return fmt.Sprintf("/htmx/message/last/%s",id)
+}
+
+func flexDirection(owner bool) string{
+
+    if owner{
+        return "flex items-center gap-2 animate-message-enter"
+    }
+
+    return "flex items-center gap-2 animate-message-enter flex-row-reverse"
+}
+
+func borderRounded(owner bool) string{
+
+    if owner{
+        return "rounded-bl-none"
+    }
+
+    return "rounded-br-none"
+}
+
+func formattedDate(date primitive.DateTime) string{
+    return date.Time().Format("15:04 PM")
+}
+
+
+templ base(user models.User, message models.Message, isOwner bool){
+  <div class={flexDirection(isOwner)} id={ containerMessageId(message.ID.Hex()) }>
+    <div class="relative inline-flex">
+      <div class="w-10 rounded-full">
+        <img
+          class="rounded-full"
+          alt="Profile picture"
+          src={ user.ProfilePicture }
+        />
+      </div>
+    </div>
+    <div class="w-full">
+      <div class="text-xs leading-5 flex gap-3 items-center">
+        <p>{ user.Username }</p>
+        <time class="text-xs opacity-50">{ formattedDate(message.Date) }</time>
+        if isOwner && !message.IsDeleted{
+            <svg hx-delete={fmt.Sprintf("/htmx/message/%s", message.ID.Hex())} hx-trigger="click" hx-target={ fmt.Sprintf("#%s",containerMessageId(message.ID.Hex())) } class="cursor-pointer size-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+            </svg>
+        }
+      </div>
+      <div
+        class={borderRounded(isOwner) +" relative block py-2 px-4 rounded-lg bg-black text-white"}
+      >
+        <p>
+            if message.IsDeleted{
+                <span class="italic">This message has been deleted</span>
+            } else {
+                { message.Content }
+            }
+        </p>
+        if !message.IsDeleted {
+            @emote.Add(isOwner, message.ID)
+        }
+      </div>
+      if !message.IsDeleted{
+        @emote.Emotes(message)
+      }
+    </div>
+  </div>
+}
+
+templ Message(user models.User, message models.Message, isOwner bool){
+    <div hx-swap-oob="beforeend:#message-container">
+        @base(user, message, isOwner)
+    </div>
+}
+
+templ EmptyMessage(user models.User, message models.Message, isOwner bool){
+    <div id={containerMessageId(message.ID.Hex())} hx-swap-oob="true">
+        @base(user, message, isOwner)
+    </div>
+}
+
+templ Pagination(userID string, messages []models.EmbdedMessage){
+
+  <div hx-swap-oob="afterbegin:#message-container">
+      if len(messages) >= 10{
+         <div hx-get={pathMessage(messages)} hx-trigger="intersect once" hx-swap="afterend"/>
+      }else{
+        <p class="italic">No more message to load </p>
+      }
+
+    for i := len(messages) - 1; i >= 0; i--{
+      @base(messages[i].User, messages[i].Message, userID == messages[i].Message.Author.Hex())
+    }
+
+  </div>
+
+}
+
+templ LastMessage(userID string, messages []models.EmbdedMessage){
+
+
+  <div hx-swap-oob="beforeend:#message-container">
+      if len(messages) >= 10{
+         <div hx-get={pathMessage(messages)} hx-trigger="intersect once" hx-swap="afterend" class="hidden" id="first-intersection"/>
+      }else{
+        <p class="italic">No more message to load </p>
+      }
+
+    for i := len(messages) - 1; i >= 0; i--{
+      @base(messages[i].User, messages[i].Message, userID == messages[i].Message.Author.Hex())
+    }
+
+  </div>
+
+}

@@ -1,0 +1,42 @@
+package chat
+
+import "github.com/michelprogram/htmx-go/internal/models"
+
+templ Websocket(user *models.User){
+
+  <div
+        id="container-websocket"
+        hx-ext="ws"
+        ws-connect="/ws/chatroom"
+        ws-reconnect="true"
+        ws-reconnect-delay="1000"
+        ws-reconnect-max-attempts="2"
+        class="row-start-2 col-start-2 row-end-3 col-end-3 text-4xl"
+    >
+    <form id="form" ws-send class="m-0">
+        <div>
+            <input type="hidden" id="id" name="id" value={ user.ID.Hex() } />
+            <p>Connected as { user.Username }</p>
+        </div>
+      <div class="flex gap-5">
+        <input
+            class="text-2xl italic flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            id="message"
+            type="text"
+            name="message"
+            placeholder="my super message"
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+            required
+        />
+        <button
+            id="send"
+            type="submit"
+            onclick="setTimeout(() => document.querySelector('#message').value = '', '10')"
+            class="text-2xl inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+            >Send</button>
+      </div>
+    </form>
+  </div>
+}

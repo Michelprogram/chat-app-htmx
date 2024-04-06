@@ -1,0 +1,26 @@
+package account
+
+import "github.com/michelprogram/htmx-go/internal/models"
+
+templ Connect(user models.User){
+    <ul hx-swap-oob="beforeend:#user-container">
+       <li>
+          <div class="flex items-center space-x-4 rtl:space-x-reverse">
+             <div class="flex-shrink-0">
+                <img class="w-8 h-8 rounded-full" src={user.ProfilePicture} alt="Profil picture" />
+             </div>
+             <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                   {user.Username}
+                </p>
+             </div>
+          </div>
+       </li>
+    </ul>
+}
+
+templ AlreadyConnected(users []models.User){
+    for _, user := range users {
+        @Connect(user)
+   }
+}

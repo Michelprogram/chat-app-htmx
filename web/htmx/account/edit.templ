@@ -1,0 +1,39 @@
+package account
+
+import "github.com/michelprogram/htmx-go/internal/models"
+
+script closeDialogEvent() {
+	document.dispatchEvent(new CustomEvent('close-edit-dialog'))
+}
+
+templ EditAccount(user models.User){
+    <form hx-post="/htmx/user">
+        <div class="grid gap-4 py-4">
+            <div class="grid grid-cols-4 items-center gap-4">
+                <label for="username" class="font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-right text-2xl">
+                    Username
+                </label>
+                <input value={user.Username} class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 col-span-3 text-xl" type="text" id="username" name="username"/>
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4">
+                <label for="name" class="font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-right text-2xl">
+                    Password (let empty to keep the same)
+                </label>
+                <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 col-span-3 text-xl" type="password" id="password" name="password"/>
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4">
+                <label for="name" class="font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-right text-2xl">
+                    Picture
+                </label>
+                <input value={user.ProfilePicture} class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 col-span-3 text-xl" type="text" id="profile_picture" placeholder="Your url" name="profile_picture"/>
+            </div>
+        </div>
+        <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:gap-x-2">
+            <button
+                onclick={ closeDialogEvent() }
+                class="inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 text-2xl" type="submit">
+                Save changes
+            </button>
+        </div>
+    </form>
+}
